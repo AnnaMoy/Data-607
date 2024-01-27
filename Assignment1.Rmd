@@ -1,0 +1,63 @@
+---
+title: "Data 607 - Assignment 1 - Loading Data into a Data Frame"
+author: "Anna Moy"
+date: "2024-02-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+The article that I choose from fivethirtyeight.com was Do You Know Where America Stands on Guns? The article discuss if American's support stricter gun laws and conducted a poll for American's after the shooting in Stoneman Douglas High School in Parkland, Florida. The data was collected after a shooting therefore the data may be skewed due to recent events. The polls suggested more than 50% of American's would want stricter laws on gun purchase. At the same time they did not want to ban the opportunity for American's to purchase assault weapons
+
+Link to the article:[Do You Know Where America Stands on Guns?]()
+
+**Load Library**
+
+```{r, load-library, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+**Load the .csv into a dataframe**
+
+```{r, load-csv, message=FALSE}
+gun_poll <-  read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/guns-polls.csv")
+```
+
+**Rename the columns**
+
+```{r, rename-columns}
+colnames(gun_poll) <- c("question","start_date", "end_date", "pollster","adult_reg","sup", "rep_sup", "demo_supp", "web")
+```
+
+**Find the mean and median for those are supporters and are adults or registered voters **
+```{r, summarize}
+gun_poll %>%
+  group_by(adult_reg) %>%
+  summarize(mean_sup = mean(sup), median_sup = median(sup))
+```
+
+**Select only Adults and the # of supports data and columns**
+``` {r subset}
+adults <- subset(gun_poll, adult_reg == "Adults" & sup > 0, select = c(adult_reg, sup))
+adults
+```
+
+### Bar Plot
+
+What is the number of respondents that check the weather?
+
+```{r plot-check-gun_poll, echo=FALSE}
+ggplot(gun_poll, aes(x = adult_reg, color = adult_reg, fill = adult_reg)) +
+  geom_bar() +
+  xlab("Adult and Registered Voters") +
+  ylab("# of Adult and Registered Voters")
+```
+
+# Conclusion
+The poll was conducted after a shooting my suggestion is conduct another poll afterwards to see if the prespectives of the Americans have changed on their idea of having stricter gun laws. It will allow us to see if there is a correlation between a recent shooting versus no recent shootings. 
+
