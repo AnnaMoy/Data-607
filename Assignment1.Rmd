@@ -15,33 +15,39 @@ The article that I choose from fivethirtyeight.com was Do You Know Where America
 
 Link to the article:[Do You Know Where America Stands on Guns?]()
 
-**Load Library**
+# Load Library
 
+Load the packages to R
 ```{r, load-library, message=FALSE}
 library(tidyverse)
 library(ggplot2)
 ```
 
-**Load the .csv into a dataframe**
+# Load the .csv into a dataframe
 
+Loading the .csv file into the data frame gun_poll
 ```{r, load-csv, message=FALSE}
 gun_poll <-  read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/guns-polls.csv")
 ```
 
-**Rename the columns**
+# Rename the columns
 
+Renaming the columns in the data frame to a consistent format
 ```{r, rename-columns}
 colnames(gun_poll) <- c("question","start_date", "end_date", "pollster","adult_reg","sup", "rep_sup", "demo_supp", "web")
 ```
 
-**Find the mean and median for those are supporters and are adults or registered voters **
+# Find the Mean and Median
+
+Find the mean and median for those are supporters and are adults or registered voters
 ```{r, summarize}
 gun_poll %>%
   group_by(adult_reg) %>%
   summarize(mean_sup = mean(sup), median_sup = median(sup))
 ```
 
-**Select only Adults and the # of supports data and columns**
+# Select a subset of the dataframe columns
+Select only Adults and the # of supports data and columns
 ``` {r subset}
 adults <- subset(gun_poll, adult_reg == "Adults" & sup > 0, select = c(adult_reg, sup))
 adults
