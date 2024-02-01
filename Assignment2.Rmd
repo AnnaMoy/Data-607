@@ -1,0 +1,72 @@
+---
+title: "Assignment2"
+author: "Anna Moy"
+date: "2024-02-04"
+output: html_document
+---
+
+
+#  Data 607
+## Week Two - R and SQL
+
+### Part 1: Build Table
+Choose six recent popular movies.
+
+- Ask at least five people that you know (friends, family, classmates, imaginary friends if
+necessary) to rate each of these movies that they have seen on a scale of 1 to 5.
+
+Movies: Mean Girls, Wonka, Aquaman And The Last Kingdom, The Beekeeper, Night Swim and Migration
+
+Person1 ratings:5,3,5,3,4,4
+Person2 ratings:3,3,4,4,4,3
+Person3 ratings:4,3,4,3,3,3
+Person4 ratings:3,4,4,3,3,4
+Person5 ratings:3,3,3,3,2,3
+
+
+### Part 2: Store data in SQL database
+- Take the results (observations) and store them in the class MySQL database:
+- Server name: cunydata607sql.mysql.database.azure.com
+- Username / password: will be given to you in an email
+Note: it is good practice to change your password. To do so, use this SQL command:
+SET PASSWORD = ‘<your new password here>';
+
+### SQL Query:
+
+CREATE TABLE movies (
+  popular_movie VARCHAR(200) NULL,
+  person1_rating INT NULL,
+  person2_rating INT NULL,
+  person3_rating INT NULL,
+  person4_rating INT NULL,
+  person5_rating INT NULL);
+
+INSERT INTO movies(popular_movie, person1_rating, person2_rating, person3_rating, person4_rating, person5_rating)
+
+VALUES('Mean girls', 5,3,4,3,3),
+('Wonka', 3,3,3,4,3),
+('Aquaman and the last kingdom', 5,4,4,4,3),
+('The beekeeper', 3,4,3,3,3),
+('Night swim', 4,4,3,3,2),
+('Migration',4,3,3,4,3);
+
+select *
+from movies;
+
+
+### Part 3: Transfer data from SQL database to R dataframe
+- Load the information from the SQL database into an R dataframe.
+
+library("RMySQL")
+
+mydb<-dbConnect(MySQL(),user='anna.moy40',password='XXXX',dbname='anna.moy40',host ='cunydata607sql.mysql.database.azure.com')
+
+dbListTables(mydb)
+
+### Part 4: Missing data strategy
+- Implement an approach to missing data
+- Explain why you decided to take the chosen approach
+Note: consider that later in the course you will revisit this information you have collected and
+will use it to implement a Recommender.
+
+My approach to missing data is to remove the missing data in the file to perform calculations such as mean, and median. I decided to take this approach because it allows you to continue to perform your calculation if you remove the missing data. If missing data is in your data it may cause errors and not perform the calculation you want.  
