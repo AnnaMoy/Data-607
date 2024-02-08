@@ -1,0 +1,119 @@
+---
+title: "Assignment3"
+author: "Anna Moy"
+date: "2024-02-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-tidyverse, message=FALSE}
+library(tidyverse)
+library(readr)
+```
+
+1. Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+Loading the .csv file for College Majors data
+```{r select-certain-word, message = FALSE}
+degree <-  read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/majors-list.csv")
+
+degree <- degree %>%
+  filter(grepl("DATA", Major) | grepl("STATISTICS", Major))
+
+degree
+```
+
+2. Write code that transforms the data below:
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"
+
+Into a format like this:
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+```{r}
+berry <- c('[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"')
+
+a <-str_sub(berry, 5, 17)
+b <-str_sub(berry, 20, 29)
+c <-str_sub(berry, 35, 46)
+d <-str_sub(berry, 50, 63)
+e <-str_sub(berry, 70, 80)
+f <-str_sub(berry, 85, 96)
+g <-str_sub(berry, 101, 113)
+h <-str_sub(berry, 115, 126)
+i <-str_sub(berry, 135, 146)
+j <-str_sub(berry, 150, 155)
+k <-str_sub(berry, 165, 172)
+l <-str_sub(berry, 180, 189)
+m <-str_sub(berry, 201, 207)
+n <-str_sub(berry, 216, 228)
+
+berry2 <- str_c("c(",a, ", ",b,", ",c,", ",d,", ",e,", ",f,", ",g,", ",h,", ",i,", ",j,", ",k,", ",l,", ",m,", ",n,")")
+
+writeLines(berry2)
+```
+
+3. Describe, in words, what the expressions will match: 
+- (.)\1\1
+This is three letters of the same character.
+```{r}
+data <- c("aaa")
+str_view(data,"(.)\\1\\1")
+```
+- "(.)(.)\\2\\1"
+It represents 2 letters(2 same letters or different) and then the letters are switched in order. 
+
+```{r}
+data <- c("abba")
+str_view(data,"(.)(.)\\2\\1")
+```
+- (..)\1
+
+It represents 2 letters (2 same letters or different) that are repeating.
+```{r}
+data <- c("baba")
+str_view(data, "(..)\\1")
+```
+
+- "(.).\\1.\\1"
+This represents 1 letter repeated 3 times with a letter in between the repeating letters.
+```{r}
+data <- c("abaca")
+str_view(data, "(.).\\1.\\1")
+```
+
+- "(.)(.)(.).*\\3\\2\\1"
+This represents 3 letter(same or different letters) with no letter or another random letter that can repeat and the original 3 letter switched around.
+```{r}
+data <- c("abceecba")
+str_view(data,"(.)(.)(.).*\\3\\2\\1")
+```
+
+4. Construct regular expressions to match words that:
+- Start and end with the same character.
+``` {r}
+data <- c("TOT")
+str_view(data, "(.).\\1")
+```
+- Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+```{r}
+data <- c("chch")
+str_view(data, "(..)\\1")
+```
+
+- Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+```{r}
+data <- c("pupap")
+str_view(data, "(.).\\1.\\1")
+```
