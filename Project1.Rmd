@@ -1,0 +1,88 @@
+---
+title: "Project1"
+author: "Anna Moy"
+date: "2024-02-08"
+output:
+  html_document: default
+  pdf_document: default
+---
+### Load text file into R and removing the ---- on the file
+```{r load-txt file}
+chess <- read.delim("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/Tournament.txt", sep = "|" ,header = FALSE)[-c(1:4,7,10, 13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97,100,103,106,109,112,115,118,121,124,127,130,133,136,139,142,145,148,151,154,157,160,163,166,169,172,175,178,181,184,187,190,193,196),-c(11)]
+```
+### Load library
+```{r load-library, message = FALSE}
+library(tidyverse)
+```
+
+## Transform the data
+```{r separate}
+# extract the pair number, name, state, total_points, rating line information
+pair_num <- str_subset(chess$V1, pattern = "\\d+")
+name <- str_subset(chess$V2, pattern = "[A-Za-z]+ [A-Za-z]+ ")
+state <- str_subset(chess$V1, pattern = "[A-Za-z]+")
+total_point <- str_subset(chess$V3, pattern ="\\d+.\\d+" )
+rating <- str_subset(chess$V2, pattern ="\\d+")
+
+# remove blanks space from state
+state<- str_remove_all(state, " ")
+# extract only the player's pre-rating and post-rating
+pre_rating <- str_sub(rating, 16,19)
+post_rating <-str_sub(rating, 25,29)
+
+# Take every other row and extract the round 1 to round 7 numbers
+row1_data<-chess %>%
+    slice(which(row_number() %% 2 == 1))
+round1<-str_sub(row1_data$V4, 4,5)
+round2<-str_sub(row1_data$V5, 4,5)
+round3<-str_sub(row1_data$V6, 4,5)
+round4<-str_sub(row1_data$V7, 4,5)
+round5<-str_sub(row1_data$V8, 4,5)
+round6<-str_sub(row1_data$V9, 4,5)
+round7<-str_sub(row1_data$V10, 4,5)
+
+#transfer to numeric
+round1 = as.numeric(round1)
+round2 = as.numeric(round2)
+round3 = as.numeric(round3)
+round4 = as.numeric(round4)
+round5 = as.numeric(round5)
+round6 = as.numeric(round6)
+round7 = as.numeric(round7)
+
+# Convert information into a data frame
+df <- data.frame(pair_num, name, state, total_point, pre_rating, post_rating)
+
+# Transform the data to numeric for particular columns
+df2<-transform(df,pair_num = as.integer(pair_num),total_point = as.numeric(total_point),pre_rating = as.numeric(pre_rating),post_rating = as.numeric(post_rating))
+
+# Get the post-rating for each round
+Round1 <-df2$pre_rating[round1]
+Round2 <-df2$pre_rating[round2]
+Round3 <-df2$pre_rating[round3]
+Round4 <-df2$pre_rating[round4]
+Round5 <-df2$pre_rating[round5]
+Round6 <-df2$pre_rating[round6]
+Round7 <-df2$pre_rating[round7]
+
+#combine all the rounds in a data frame
+together <- data.frame(Round1, Round2, Round3, Round4, Round5, Round6, Round7)
+# avg of all the rounds
+avg <- rowMeans(together, na.rm =T)
+
+#round avg to the nearest whole number
+avg <-round(avg,digits=0)
+
+#Convert into a data frame
+chess_tournament <- data.frame(pair_num, name, state, total_point, pre_rating, post_rating, Round1, Round2, Round3, Round4, Round5, Round6, Round7, avg)
+
+# Rename the column names
+colnames(chess_tournament) <- c("Pair Num", "Player's Name", "Player's State", "Total Number of Points"," Player's Pre-Rating", "Player's Post-Rating", "Round 1", "Round 2", "Round 3", "Round 4", "Round 5", "Round 6", "Round 7", "Average Pre Class Rating of Opponents")
+
+chess_tournament
+```
+
+### Write to CSV
+``` {r write as CSV}
+write.csv(chess_tournament, "chess_tournament.csv")
+```
