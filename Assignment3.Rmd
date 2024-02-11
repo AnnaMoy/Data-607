@@ -102,17 +102,20 @@ str_view(data,"(.)(.)(.).*\\3\\2\\1")
 
 4. Construct regular expressions to match words that:
 - Start and end with the same character.
+  expression: (.).\\1
 ``` {r}
 data <- c("TOT")
 str_view(data, "(.).\\1")
 ```
 - Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+  expression: (..)\\1
 ```{r}
 data <- c("chch")
 str_view(data, "(..)\\1")
 ```
 
 - Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+  expression: (.).\\1.\\1
 ```{r}
 data <- c("pupap")
 str_view(data, "(.).\\1.\\1")
