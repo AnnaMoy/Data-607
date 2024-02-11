@@ -102,7 +102,6 @@ str_view(data,"(.)(.)(.).*\\3\\2\\1")
 
 4. Construct regular expressions to match words that:
 - Start and end with the same character.
-  expression: (.)\\1
 ``` {r}
 data <- c("TOT", "TOTO", "TOCT")
 str_view(data, "^(.).*\\1$")
