@@ -1,0 +1,80 @@
+---
+title: "Assignment5"
+author: "Anna Moy"
+date: "2024-02-25"
+output: html_document
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-library, message = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+### Read the csv file for airlines
+```{r read-csv, message = FALSE}
+airline <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/airline.csv")
+
+airline
+```
+
+### Remove the blank line on data
+```{r read-blank-line}
+airline <- airline[-3,]
+```
+### Fill in blank data for airline
+```{r fill-in-blank-data}
+airline %>%
+  fill('...1', .direction = "down")
+```
+
+### Transpose the data and rename column title
+```{r transpose}
+airline <- airline %>%
+  fill('...1', .direction = "down") %>%
+  pivot_longer(-c('...1', '...2'), names_to = "location") %>%
+  pivot_wider(names_from ='...2', values_from = value) %>%
+  rename("airline"= '...1', "on_time" = 'on time')
+airline
+```
+
+### Find the average and median for each airline delays and on time
+```{r airline-delays}
+airline %>%
+  group_by(airline) %>%
+  select (airline, on_time, delayed) %>%
+  summarize(meandelay = mean(delayed), mediandelay = median(delayed), meanontime = mean(on_time), medianontime = median(on_time))
+```
+
+### Find the percent delay for each airline by location in descending order
+```{r delay-by_location}
+airline %>%
+  group_by(airline) %>%
+  mutate(total_delay = sum(delayed), percent_delay = (delayed/total_delay)*100) %>%
+  arrange(airline, desc(percent_delay))
+```
+
+### Summary of each airline on time and delay data
+```{r summary-each-airline}
+airline %>%
+  filter(airline == "ALASKA") %>%
+  summary(airline)
+
+airline %>%
+  filter(airline == "AM WEST") %>%
+  summary(airline)
+```
+
+### Plot delay by location for each airline
+```{r plot-delay}
+ggplot(airline, aes(location, delayed, color = airline)) +
+  geom_point()
+```
+
+## Conclusion
+AM West has more delays than Alaska as the average and median are higher than Alaska.  The locations with the highest delayed for Alaska airline are Seattle and San Francisco.The locations with the highest delayed for AM West is Phoenix and San Francisco. 
