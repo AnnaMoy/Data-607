@@ -53,11 +53,24 @@ airline %>%
 
 ### Find the percent delay for each airline by location in descending order
 ```{r delay-by_location}
-airline %>%
+flight <- airline %>%
   group_by(airline) %>%
-  mutate(total_delay = sum(delayed), percent_delay = (delayed/total_delay)*100) %>%
+  mutate(total_delay = sum(delayed), total_ontime = sum(on_time),all_flight = total_delay + total_ontime, percent_rate = delayed/all_flight, percent_delay = (delayed/all_flight)) %>%
   arrange(airline, desc(percent_delay))
+flight
 ```
+
+### Total flights for Alaska and AM West
+```{r total-delays}
+total <- airline %>%
+  group_by(airline) %>%
+  summarize(sum = sum(delayed)) 
+
+total
+```
+
+### flights by location
+
 
 ### Summary of each airline on time and delay data
 ```{r summary-each-airline}
@@ -72,9 +85,19 @@ airline %>%
 
 ### Plot delay by location for each airline
 ```{r plot-delay}
-ggplot(airline, aes(location, delayed, color = airline)) +
-  geom_point()
+ggplot(flight, aes(x = location, y = percent_delay, fill = airline)) +
+  geom_bar(stat = "identity", position = "dodge")
+```
+
+```{r plot-total}
+ggplot(total, aes(x = airline, sum, fill = airline)) +
+  geom_bar(stat = "identity", position = "dodge")
+```
+
+```{r plot-delayed_percent}
+ggplot(flight, aes(x = airline, percent_rate, fill = airline)) +
+  geom_bar(stat = "identity", position = "dodge")
 ```
 
 ## Conclusion
-AM West has more delays than Alaska as the average and median are higher than Alaska.  The locations with the highest delayed for Alaska airline are Seattle and San Francisco.The locations with the highest delayed for AM West is Phoenix and San Francisco. 
+AM West has more delays than Alaska as the average and median are higher than Alaska. But if we look at the overall flights compared to the percentage of delay we will notice that Alaska has more delays then AM West. There was a bias if we were jsut looking at over all delayed in total without looking overall picture. 
