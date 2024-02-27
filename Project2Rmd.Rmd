@@ -1,0 +1,224 @@
+---
+title: "Project2"
+author: "Anna Moy"
+date: "2024-03-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-library, message = FALSE}
+library(tidyverse)
+```
+
+# 1.Dataset - MTA Daily Ridership Data: Beginning 2020
+
+In the MTA dataset, determine the average ridership in the different transportation such as the Subway, Buses, LIRR and Metro-North. This will help us determine which transportation most people most likely would take. Since the dataset started in 2020 when the pandemic happened I wanted to find out if there were more people taking the Subway or Buses in 2020 and what the highest and lowest ridership. 
+
+To prepare the dataset I had to change it from wide to long and separate out the date column to be able to extract data based on the year. It allows me to extract the different types of transportation and their ridership. 
+
+### Load .csv file 
+``` {r load-csv-file, message = FALSE}
+mta <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/MTA_Daily_Ridership_Data.csv")
+
+mta
+```
+
+### Transform data
+``` {r wide-to-long}
+# Change from wide to long data 
+mta <- mta %>%
+  pivot_longer(-Date, names_to =c("transportation","percent_prepandemic"),
+               names_sep = ":", ) %>%
+  pivot_wider(names_from = percent_prepandemic, values_from = value)
+
+#separate out the dates into their own columns
+mta <- mta %>%
+  separate(Date, into = c("month", "date", "year")) 
+
+#rename the column names
+colnames(mta) <- c("month", "date", "year", "transportation", "total_ridership", "percent_prepandemic", "total_trips", "total_traffic")
+
+#change certain columns to integers
+mta$month <- as.integer(mta$month)
+mta$date <- as.integer(mta$date)
+mta$year <- as.integer(mta$year)
+mta$total_ridership <- as.integer(mta$total_ridership)
+mta$total_traffic <- as.integer(mta$total_traffic)
+mta$total_trips <- as.integer(mta$total_trips)
+
+mta
+```
+
+# Analysis
+
+Summarize the 2020,2021, 2022 average ridership for Subway, Buses, LIRR and Metro-North. 
+```{r summarize, message = FALSE}
+mta_summary <- mta %>%
+  filter(transportation =="Subways" & year == 2020 |transportation =="Subways" & year == 2021 | transportation =="Subways" & year == 2022 |transportation =="Buses" & year == 2020 |transportation =="Buses" & year == 2021 | transportation =="Buses" & year == 2022 | transportation =="LIRR" & year == 2020 |transportation =="LIRR" & year == 2021 | transportation =="LIRR" & year == 2022 | transportation =="Metro-North" & year == 2020 |transportation =="Metro-North" & year == 2021 | transportation =="Metro-North" & year == 2022 ) %>%
+  group_by(year, transportation) %>%
+  summarize(mean_rideship = mean(total_ridership), na.rm = TRUE) %>%
+  arrange(desc(mean_rideship)) 
+
+mta_summary
+```
+  
+Determine if there were more people taking the bus or subway in 2020.
+
+```{r Subway-vs-Bus, message = FALSE}
+sub_or_bus <- mta %>%
+  group_by(year, transportation) %>%
+  filter(transportation == "Subways" & year == 2020 | transportation == "Buses" & year == 2020) %>%
+  summarize(sum_rideship = sum(total_ridership)) 
+
+sub_or_bus
+```
+
+Which transportation has the highest and lowest ridership in 2020
+```{r low-and-high}
+low_high <- mta %>%
+  group_by(transportation) %>%
+  summarize(max = max(total_ridership), min = min(total_ridership)) %>%
+  arrange(desc(max))
+
+low_high
+```
+
+# Conclusion
+The largest amount of people riding the Subways was in 2022, 2021 and 2020. In 2020 there were more people taking the subway than buses and there were up to 5,498,809 people taking the subway and at it's low point there was only 198,399 people taking the Subway. 
+
+# 2. Dataset - Global Inflation Data
+
+In the Global Inflation Data I had to determine which region had the highest and lowest CPI which will tells us how the market basket of consumer good and services changes over time. We can take a closer look at the United States country and see the change in the recent years on how the avg. CPI changes as well as view when the min and max CPI happened. 
+
+
+To prepare the dataset I had to create a csv to determine the region for each country as suggested by Mohammed Rahman. 
+
+### Load .csv file 
+``` {r load-file, message = FALSE}
+global <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/global_inflation_data.csv")
+region <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/region.csv")
+
+#combine both files together
+colnames(region) <- c("country_name", "region")
+global <- merge(global, region, by = "country_name")
+```
+
+### Transform data
+```{r data-change}
+#change from wide data to long data and removing NA
+global <- global %>%
+  pivot_longer(`1980`:`2024`,names_to = "year", values_to = "avg_inflationCPI", values_drop_na = TRUE) %>%
+  select(country_name, region, year, avg_inflationCPI)
+
+global
+```
+
+Analysis 
+Compare the inflation rate of countries in the same region
+
+```{r region-comparison}
+# Find the min and max for all the regions and sort it
+global_max <- global %>%
+  group_by(region) %>%
+  summarize(max_cpi = max(avg_inflationCPI)) %>%
+  arrange(desc(max_cpi))
+
+global_min <- global %>%
+  group_by(region) %>%
+  summarize(min_cpi = min(avg_inflationCPI)) %>%
+  arrange(min_cpi)
+
+global_max
+global_min
+
+```
+
+```{r filter-country}
+# Filter for one region and look at the min and max and sort the avg_inflationCPI to see when it was the lowest CPI
+us <- global %>%
+  filter(country_name == "United States") %>%
+  mutate(min = min(avg_inflationCPI), max = max(avg_inflationCPI)) %>%
+  arrange(desc(year))
+
+us
+```
+  
+# Conclusion
+The highest CPI across all the different regions is South/Latin America with 65374 and the lowest CPI is Africa at -72.7. The data has extreme outliers for some of the locations as you can see from the difference in CPI number. The CPI shows there is less changes in CPI for North America.  When viewing the United States CPI change over time you can see the max was from 1980 and the min was from 2009. And over the years the CPI has been very stable and very similar each year. 
+
+# 3. Dataset - Laptop Prices
+
+In the Laptop prices dataset is to find a summary statistics on the min, max, median of the prices of the different types of laptop. And finding out which laptop has the largest screen and weights the most. It would be helpful to know which Company produces the highest and lowest rams for their computers. 
+
+To be able to analyze the data I had to clean up the data and remove some of the numbers with the characters to be able to find out the min and max. 
+
+### Load .csv file 
+``` {r load-laptop-file, message = FALSE}
+laptop <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/laptop.csv")
+
+laptop
+```
+
+### Transform data
+```{r transform-laptop}
+#Remove the blank rows
+laptop <- laptop %>%
+  drop_na()
+
+# Separate out the number and character from Ram, Weight, Memory
+ram <- str_sub(laptop$Ram, 1,4)
+ram2 <- as.integer(str_extract(ram, "[0-9]+"))
+gb <- (str_extract(ram, "[aA-zZ]+"))
+weight <-str_sub(laptop$Weight, 1,6)
+kg <- (str_extract(weight, "[aA-zZ]+"))
+wght <- as.numeric(str_extract(weight, "[0-9]+"))
+
+#Separate out the Memory column into 2 columns then separate out the number and characters
+laptop[c("mem", "gb")] <- str_split_fixed(laptop$Memory, " + ", 2)
+mem1 <- str_sub(laptop$mem, 1,5)
+mem2 <- as.integer(str_extract(mem1, "[0-9]+"))
+gb2 <-(str_extract(mem1,"[aA-zZ]+" ))
+
+laptop_data <- data.frame(laptop,ram2, gb, weight, kg, wght, mem2, gb2)
+glimpse(laptop_data)
+```
+
+# Analysis
+
+Determine the summary statistics on price of the laptops
+```{r laptop price, message = FALSE}
+laptop_price <- laptop_data %>%
+  group_by(TypeName) %>%
+  summarize(mean = mean(Price), median = median(Price), min = min(Price), max = max(Price), na.rm = T) %>%
+  arrange(mean)
+
+laptop_price
+```
+
+Determine which laptop weights the most
+```{r cost-weight-and-size}
+laptop_size <- laptop_data %>%
+  group_by(TypeName) %>%
+  summarize(weight = max(wght), size = max(Inches), avg = mean(Price)) %>%
+  arrange(desc(weight))
+
+laptop_size
+```
+
+Which laptop has the most Ram for Apple
+``` {r most_ram}
+laptop_ram <- laptop_data %>%
+  group_by(Company) %>%
+  summarize(ram = max(ram2), ram_min = min(ram2)) %>%
+  arrange(desc(ram))
+
+laptop_ram
+```
+  
+# Conclusion
+It can be concluded that for the cheapest laptop type is the Netbook and the most expensive is the Workstation. The average cost of the different types of laptop ranges from 34,885 to 121,498. The largest and heaviest laptop is the Notebook with an average price of 41,545. The Company that produces the largest Ram is Lenovo, Dell and Asus at 64 GB.
+
+
