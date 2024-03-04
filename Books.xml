@@ -1,18 +1,18 @@
-<?xml version =“1.0” encoding =“UTF-8” ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Booklist>
-<books ID=“001”>
+<books ID="001">
 	<title>The Legend of Zelda:Twlight princess</title>
 	<genre>Graphic novels</genre>
 	<published>2017 by Viz Media</published>
 	<ISBN>97814121593470</ISBN>
 </books>
-<books ID=“002”>
+<books ID="002">
 	<title>The Notebook</title>
 	<genre>Love stories</genre>
 	<published>1996 by Warner Books</published>
 	<ISBN>9780446520805</ISBN>
 </books>
-<books ID=“003”>
+<books ID="003">
 	<title>The Whiteout</title>
 	<genre>Short stories</genre>
 	<published>2022 by Quill Tree Books</published>
