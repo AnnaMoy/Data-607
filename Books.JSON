@@ -1,0 +1,27 @@
+[
+    {
+        "title": "The Legend of Zelda: Twlight princess",
+        "Author": "Akira Himekawa",
+        "Genre": "Graphic novels",
+        "Published": "2017 by Viz Media",
+        "ISBN": "97814121593470"
+    },
+    {
+        "title": "The Notebook",
+        "Author": "Nicholas Sparks",
+        "Genre": "Love stories",
+        "Published": "1996 by Warner Books",
+        "ISBN": "9780446520805"
+    },
+    {
+        "title": "The Whiteout",
+        "Author": [
+            "Dhonielle Clayton",
+            "Tiffany Jackson",
+            "Nic Stone"
+        ],
+        "Genre": "Short stories",
+        "Published": "2022 by Quill Tree Books",
+        "ISBN": "978006388146"
+    }
+]
