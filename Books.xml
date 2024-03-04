@@ -2,18 +2,21 @@
 <Booklist>
 <books ID="001">
 	<title>The Legend of Zelda:Twlight princess</title>
+	<author> Akira Himekawa </author>
 	<genre>Graphic novels</genre>
 	<published>2017 by Viz Media</published>
 	<ISBN>97814121593470</ISBN>
 </books>
 <books ID="002">
 	<title>The Notebook</title>
+	<author>Nicholas Sparks</author>
 	<genre>Love stories</genre>
 	<published>1996 by Warner Books</published>
 	<ISBN>9780446520805</ISBN>
 </books>
 <books ID="003">
 	<title>The Whiteout</title>
+	<author>Dhonielle Clayton, Tiffany Jackson, Nic Stone</author>
 	<genre>Short stories</genre>
 	<published>2022 by Quill Tree Books</published>
 	<ISBN>978006388146</ISBN>
