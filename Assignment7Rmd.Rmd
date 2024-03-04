@@ -1,0 +1,63 @@
+---
+title: "Assignment 7"
+author: "Anna Moy"
+date: "2024-03-10"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-library, message = FALSE}
+library(rvest)
+library(xml2)
+library(jsonlite)
+library(tibble)
+```
+
+# Read the HTML and make it into a dataframe
+
+```{r read-html}
+books<- read_html("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/Books.html", trim = T, as.data.frame = T)
+
+books<- books %>%
+  html_node("table")%>% 
+  html_table(header =TRUE, fill = TRUE) 
+books
+
+#Another way to run it for myself knowledge
+# df_table <- books %>% 
+#  html_element(xpath = "//table") %>% 
+#  html_table()
+```
+
+
+# Read the XML and make into a dataframe
+```{r read-xml}
+booksxml <- read_xml("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/Books.xml")
+
+title <- xml_text(xml_find_all(booksxml, xpath ="//title"))
+author <- xml_text(xml_find_all(booksxml, xpath ="//author"))
+genre <- xml_text(xml_find_all(booksxml, xpath ="//genre"))
+published <- xml_text(xml_find_all(booksxml, xpath ="//published"))
+ISBN <- xml_text(xml_find_all(booksxml, xpath ="//ISBN"))
+
+df2<-data_frame(title,author,genre,published,ISBN)
+df2
+```
+
+# Read the JSON and make into a dataframe
+
+```{r readjson}
+bookjson <- fromJSON("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/Books.JSON")
+
+json_data_frame <- as.data.frame(bookjson)
+json_data_frame
+```
+
+# Conclusion
+
+The HTML, XML and JSON data output all look fairly the same except the JSON did not print it out in the same format. They are not 100% idenitical but very similar. It was the hardest to load the XML as I had to covert the data into columns then print it out as a dataframe. 
