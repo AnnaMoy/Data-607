@@ -86,8 +86,18 @@ low_high <- mta %>%
 low_high
 ```
 
+Which transportation has the highest and lowest ridership in 2023
+```{r low-and-high-2023}
+low_high_2023 <- mta %>%
+  filter(year == 2023) %>%
+  group_by(transportation) %>%
+  summarize(max = max(total_ridership), min = min(total_ridership)) %>%
+  arrange(desc(max))
+
+low_high_2023
+```
 # Conclusion
-The largest amount of people riding the Subways was in 2022, 2021 and 2020. In 2020 there were more people taking the subway than buses and there were up to 5,498,809 people taking the subway and at it's low point there was only 198,399 people taking the Subway. 
+The largest amount of people riding the Subways was in 2022, 2021 and 2020. In 2020 there were more people taking the subway than buses and there were up to 5,498,809 people taking the subway and at it's low point there was only 198,399 people taking the Subway. Overall the ridership in 2023 has not returned to how it was in 2020. 
 
 # 2. Dataset - Global Inflation Data
 
@@ -101,7 +111,7 @@ To prepare the dataset I had to create a csv to determine the region for each co
 global <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/global_inflation_data.csv")
 region <- read_csv("https://raw.githubusercontent.com/AnnaMoy/Data-607/main/region.csv")
 
-#combine both files together
+#combine both files together to add in region for analysis and selecting only the columns I need
 colnames(region) <- c("country_name", "region")
 global <- merge(global, region, by = "country_name")
 ```
@@ -113,7 +123,15 @@ global <- global %>%
   pivot_longer(`1980`:`2024`,names_to = "year", values_to = "avg_inflationCPI", values_drop_na = TRUE) %>%
   select(country_name, region, year, avg_inflationCPI)
 
-global
+global 
+
+# Separate out data for region only  analysis
+region_only <- global %>%
+  select(region, year, avg_inflationCPI)
+
+region_only
+
+#
 ```
 
 Analysis 
@@ -136,6 +154,22 @@ global_min
 
 ```
 
+
+```{r region only}
+# See how region overall looks like in their CPI
+region_year <- region_only %>%
+  group_by(region, year) %>%
+  summarize(overall = mean(avg_inflationCPI))
+
+region_year
+
+ggplot(region_year, aes(year, overall)) +
+      geom_bar(stat= "identity", position = "dodge") +
+      coord_flip() +
+      facet_wrap(~region)
+```
+
+
 ```{r filter-country}
 # Filter for one region and look at the min and max and sort the avg_inflationCPI to see when it was the lowest CPI
 us <- global %>%
@@ -146,8 +180,15 @@ us <- global %>%
 us
 ```
   
+```{r plot}
+ggplot(us, aes(year, avg_inflationCPI)) +
+  geom_bar(stat = "identity", position ="dodge" ) +
+  coord_flip()
+   
+```  
+  
 # Conclusion
-The highest CPI across all the different regions is South/Latin America with 65374 and the lowest CPI is Africa at -72.7. The data has extreme outliers for some of the locations as you can see from the difference in CPI number. The CPI shows there is less changes in CPI for North America.  When viewing the United States CPI change over time you can see the max was from 1980 and the min was from 2009. And over the years the CPI has been very stable and very similar each year. 
+The highest CPI across all the different regions is South/Latin America with 65374 and the lowest CPI is Africa at -72.7. The data has extreme outliers for some of the locations as you can see from the difference in CPI number. The CPI shows there is less changes in CPI for North America.  When viewing the United States CPI change over time you can see the max was from 1980 and the min was from 2009. The CPI use to be really high and it decreased and has a spike back in 2022. Based on the different region South/Central America had the most changes in CPI and spikes.
 
 # 3. Dataset - Laptop Prices
 
