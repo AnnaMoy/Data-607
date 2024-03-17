@@ -1,0 +1,33 @@
+---
+title: "Assignment 9"
+author: "Anna Moy"
+date: "2024-03-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The New York Times web site provides a rich set of APIs, as described here: (https://developer.nytimes.com/apis)
+
+You’ll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it into an R DataFrame.
+
+# Load library
+```{r library, message = FALSE}
+
+library(jsonlite)
+```
+
+# Load API and API Key on the URL and load as dataframe
+```{r API}
+books_url <- ("https://api.nytimes.com/svc/books/v3/lists/names.json?api-key=lB6izVNFT7zMy5s1eRiPKwEAfBlAyctS")
+
+books <- fromJSON(books_url)
+books_dataframe <- as.data.frame(books)
+
+books_dataframe
+```
+
