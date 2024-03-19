@@ -17,7 +17,7 @@ Your task is to choose one of the New York Times APIs, construct an interface in
 
 # Load library
 ```{r library, message = FALSE}
-
+library(httr)
 library(jsonlite)
 ```
 
@@ -25,9 +25,11 @@ library(jsonlite)
 ```{r API}
 books_url <- ("https://api.nytimes.com/svc/books/v3/lists/names.json?api-key=lB6izVNFT7zMy5s1eRiPKwEAfBlAyctS")
 
-books <- fromJSON(books_url)
-books_dataframe <- as.data.frame(books)
+books <- GET(books_url)
 
+books2 <- fromJSON(content(books, type = "text"))
+
+books_dataframe <- as.data.frame(books2)
 books_dataframe
 ```
 
