@@ -1,0 +1,211 @@
+---
+title: "Assignment 10"
+author: "Anna Moy"
+date: "2024-03-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment 10 
+
+In Text Mining with R, Chapter 2 looks at Sentiment Analysis.  In this assignment, you should start by getting the primary example code from chapter 2 working in an R Markdown document.  You should provide a citation to this base code.  You’re then asked to extend the code in two ways:
+
+Work with a different corpus of your choosing, and
+Incorporate at least one additional sentiment lexicon (possibly from another R package that you’ve found through research).
+As usual, please submit links to both an .Rmd file posted in your GitHub repository and to your code on rpubs.com.  You make work on a small team on this assignment.
+
+```{r load-library, message = FALSE}
+library(tidyverse)
+library(tidytext)
+library(janeaustenr)
+library(wordcloud)
+library(gutenbergr)
+
+get_sentiments("nrc")
+get_sentiments("afinn")
+get_sentiments("bing")
+```
+
+# AFINN Sentiment
+```{r get-sentiments, message = FALSE}
+#download the book from gutenberg
+gutenberg_metadata
+dark <- gutenberg_works(title == "Heart of Darkness") %>%
+  gutenberg_download(meta_fields = "title")
+
+# Add a column called chapters based on the I,II, III in the book
+dark2<- dark %>%
+  mutate( linenumber = row_number(),
+    chapter = cumsum(str_detect(text, regex("^([\\divxlc])+$", ignore_case = TRUE)))) %>%
+  ungroup() %>%
+  unnest_tokens(word, text)
+
+dark3 <- dark2 %>% 
+  inner_join(get_sentiments("afinn")) %>% 
+  group_by(index = linenumber %/% 80) %>% 
+  summarise(sentiment = sum(value)) %>% 
+  mutate(method = "AFINN")
+dark3
+
+# chart negative and positive sentiment
+dark3 %>%
+ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) 
+
+# count the words in the book
+count_dark <- dark2 %>%
+  group_by(chapter) %>%
+  count(word, sort = TRUE)
+count_dark
+
+#remove stop words
+remove_dark <- dark2 %>%
+  anti_join(stop_words)
+remove_dark
+
+#count the words in the book after removing stop words
+remove_dark %>%
+  count(word, sort = TRUE)
+
+# create custom words to remove ("time")
+custom_stop_words <- bind_rows(tibble(word = c("time"),  
+                                      lexicon = c("custom")), 
+                               stop_words)
+custom_stop_words
+
+# remove time from word list
+remove_dark %>%
+  anti_join(custom_stop_words) %>%
+  count(word, sort = TRUE)
+```
+
+# BING Sentiment
+```{r download}
+#download the book from gutenberg
+gutenberg_metadata
+heart <- gutenberg_works(title == "Heart of Darkness") %>%
+  gutenberg_download(meta_fields = "title")
+
+
+# Add a column called chapters based on the I,II, III in the book
+heart2<- heart %>%
+  mutate( linenumber = row_number(),
+    chapter = cumsum(str_detect(text, regex("^([\\divxlc])+$", ignore_case = TRUE)))) %>%
+  ungroup() %>%
+  unnest_tokens(word, text)
+
+heart3 <- heart2 %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(title, index = linenumber %/% 100, sentiment) %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+heart3
+
+# chart negative and positive sentiment
+ggplot(heart3, aes(index, sentiment, fill = title)) +
+  geom_col(show.legend = FALSE) 
+
+# count the words in the book
+count_heart <- heart2 %>%
+  group_by(chapter) %>%
+  count(word, sort = TRUE)
+count_heart
+```
+```{r stop-words}
+# remove stop words
+remove_heart <- heart2 %>%
+  anti_join(stop_words)
+remove_heart
+
+#count the words in the book after removing stop words
+remove_heart %>%
+  count(word, sort = TRUE)
+
+# get sentiment
+heart4 <- remove_heart %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+heart4
+
+#chart both negative and positive sentiment
+heart4 %>%
+  group_by(sentiment) %>%
+slice_max(n, n = 10) %>% 
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(x = "Contribution to sentiment",
+       y = NULL)
+```
+```{r word-cloud, message = FALSE}
+# Wordcloud postive words
+pos <- heart4 %>%
+  filter(sentiment == "positive")
+
+wordcloud(
+  words = pos$word,
+  freq = pos$n,
+  max.words = 30,
+  colors = "blue")
+
+neg <- heart4 %>%
+  filter(sentiment == "negative")
+
+# Wordcloud Negative words
+wordcloud(
+  words = neg$word,
+  freq = neg$n,
+  max.words = 30,
+  colors = "blue")
+```
+
+# Loughran sentiment
+
+```{r download-2}
+#download the book from gutenberg
+gutenberg_metadata
+lou <- gutenberg_works(title == "Heart of Darkness") %>%
+  gutenberg_download(meta_fields = "title")
+
+
+# Add a column called chapters based on the I,II, III in the book
+lou2<- lou %>%
+  mutate( linenumber = row_number(),
+    chapter = cumsum(str_detect(text, regex("^([\\divxlc])+$", ignore_case = TRUE)))) %>%
+  ungroup() %>%
+  unnest_tokens(word, text)
+
+# table with sentiments
+lou3 <- lou2 %>%
+  inner_join(get_sentiments("loughran")) %>%
+  count(title, index = linenumber %/% 100, sentiment) %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+lou3
+
+#add sentiment to loughran
+loughran_lexicon <- get_sentiments("loughran")
+
+
+# chart negative and positive sentiment
+ggplot(lou3, aes(index, sentiment, fill = title)) +
+  geom_col(show.legend = FALSE) 
+
+#custom lexicon words
+custom_lexicon <- loughran_lexicon %>%
+  bind_rows(tribble(~word, ~sentiment,
+                    "black", "negative",
+                    "eyes", "positive"))
+# look at new sentiment with customer lexicon
+custom_words <- lou2 %>%
+  inner_join(custom_lexicon) %>%
+  count(word, sentiment, sort = TRUE)
+
+custom_words
+```
