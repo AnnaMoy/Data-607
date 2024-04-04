@@ -1,0 +1,61 @@
+---
+title: "Assignment 11"
+author: "Anna Moy"
+date: "2024-03-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+**1. Perform a Scenario Design analysis as described below.  Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization's customers.**
+
+**Scenario Design for Organization: Netflix**
+
+1. Who are your target users?
+
+Netflix target users are of all ages and demographics who watches movies, TV shows and documentaries. 
+
+2. What are their key goals?
+
+Netflix key goals is to provide entertainment to people of all ages. 
+
+3. How can you help them accomplish those goals?
+
+We can help them accomplish their goals by referring users to the site for movies they might be interested to watch. 
+
+**Scenario Design for Organization's Customers: Netflix**
+
+1. Who are your target users?
+
+The organization's customers the target users will be friends/family who share the same an interest in watching TV shows, movies and documentaries. 
+
+2. What are their key goals?
+
+The customer's key goals will be get entertainment and then discuss with friends and families about the show. 
+
+3. How can you help them accomplish those goals?
+
+To accomplish these goals would be to promote Netflix on social media and other platforms to attract more users which would recommend it to their friends and families. 
+
+
+
+**2. Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.**
+
+[Netflix algorithm](https://help.netflix.com/en/node/100639)
+
+[User Experience](https://curiouscore.com/resource/analysing-netflixs-user-experience/#:~:text=Netflix%20also%20features%20good%20user,in%20the%20site%20via%20thumbnails)
+
+[User Interface](https://bootcamp.uxdesign.cc/elevating-entertainment-a-case-study-on-netflixs-user-experience-e8d49d9890b5)
+
+Netflix uses an algorithms to find out the preference of the users based on their viewing history, genres, time of day it's being watched, devices used, their rating for the shows and how long they watched it for. 
+
+It provides a simple and easy way for users to navigate from one page to another which enhances their experience and allows everyone of all ages to use it. The user interface is designed in a clean and intuitive layout such as the scrolling of the categories. It provides trailers of upcoming movies to let users know what new shows are coming up and that it may be a preference for them. Allowing users to download the movies and watch it when they don't have internet allows users to have convenience to watch it when they want. They have a rating category to allow users to tell them if they like the movie or not. 
+
+
+**3. Include specific recommendations about how to improve the site's recommendation capabilities going forward.**
+
+Recommendations to improve the site's capabilities is to not recommend movies that have been watched by the users and offer new recommendation based on that genre.
