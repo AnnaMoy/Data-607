@@ -1,0 +1,85 @@
+---
+title: "Project 4"
+author: "Anna Moy"
+date: "2024-04-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, message = FALSE}
+library(tidyverse)
+library(tm)
+library(tidytext)
+library(wordcloud)
+```
+
+```{r read-corpus, results = "hide"}
+# read the easy_ham file in the drive
+easy_ham <-"/Users/zhianna/Downloads/easy_ham/"
+#list out all the file names
+file <- list.files(easy_ham)
+# number from 1 to 2551 (number of records)
+number <- 1:2551
+
+#loop to list all files with easy_ham
+corpus <- NA
+  for(x in file)
+    {
+  doc <- print(paste0(easy_ham, x))             #print easy_ham and file name in one line
+  read <-readLines(doc)                         #read the file 
+  corpus = c(corpus, read)                          # print out all the file information
+  }
+
+corpus <- data.frame(text=unlist(corpus), stringsAsFactors=FALSE) %>%
+  unnest_tokens(word, text)
+
+# Make a vector source and volatile corpus
+corpus2 <- VectorSource(corpus)
+corpus3 <- VCorpus(corpus2)
+```
+
+# clean corpus
+```{r clean_data}
+# used to clean up a corpus file
+clean_corpus <- function(corpus) {
+  corpus <- tm_map(corpus, removePunctuation)                          # remove punctuations
+  corpus <- tm_map(corpus, content_transformer(tolower))               # change to lowercase
+  corpus <- tm_map(corpus, removeWords, words = c(stopwords("en")))    # remove stopwords
+  corpus <- tm_map(corpus, stripWhitespace)                            # remove whitespace
+  corpus <- tm_map(corpus, removeNumbers)                              # remove numbers
+  return(corpus)
+}
+```
+
+
+```{r ham}
+#clean up the corpus using the clean corpus
+ham_spam <- clean_corpus(corpus3)
+
+#Build a document term matrix
+token <-DocumentTermMatrix(ham_spam)
+token
+
+#create dataframe
+ham_spam2 <- as.data.frame(as.matrix(token))
+
+# wordcloud
+wordcloud(ham_spam, max.words = 70)
+
+```
+
+```{r training}
+# use 70% of dataset as training set and remaining 30% as testing set. 
+set.seed(1)
+sample <-sample(c(TRUE, FALSE),nrow(ham_spam2), replace = TRUE,prob = c(.7,.3))
+train < - ham_spam2[sample, ]
+test <- ham_spam2[sample, ]
+
+#view dimensions of training set
+dim(train)
+#view dimensions of test set
+dim(test)
+```
